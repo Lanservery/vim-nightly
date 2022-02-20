@@ -1,0 +1,4 @@
+vimfiles/plugged
+vimfiles/.netrwhist
+vimfiles/autoload/*.old
+vimfiles/colors/*.vim
