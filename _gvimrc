@@ -54,5 +54,5 @@ if version >= 500
 
 endif
 
-"注意:不要在安装目录修改此文件，否则无法配置改回，需要重新安装
-set lines=41 columns=130
+"注意:不要在安装目录修改此文件，否则配置无法改回，需要重新安装
+set lines=42 columns=130

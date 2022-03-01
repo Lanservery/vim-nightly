@@ -85,8 +85,6 @@ filetype on    "打开文件类型检测功能
 set autoread    "当文件被外部改变时自动读取
 set splitbelow    "ternimal在下面打开
 set termwinsize=10x0    "ternimal启动窗口大小
-" open terminal below all splits(test?)
-"cabbrev bterm bo term
 " disable vim to examine zipped files
 let g:loaded_zipPlugin= 1
 let g:loaded_zip      = 1
@@ -96,9 +94,7 @@ let g:loaded_zip      = 1
 "                                   外观                                     "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-"source $VIMRUNTIME/delmenu.vim    " 界面修改为英文
-"source $VIMRUNTIME/menu.vim
-let $LANG = 'en'
+"let $LANG = 'en'
 set number    "显示行号
 set guifont=DroidSansMono_Nerd_Font:h11
 "set guifont=DroidSansMono_NF:h11
@@ -113,6 +109,8 @@ set guioptions-=L    "hidden the left scrollbar
 set listchars=tab:>-,trail:.    " tab 字符的显示样式，且行末不显示字符
 set list    " 显示Tab字符
 set laststatus=2
+" 光标所在的当前行高亮
+set cursorline
 " StatusLine
 set statusline=%<%.50F\             "显示文件名和文件路径 (%<应该可以去掉)
 set statusline+=%=%y%m%r%h%w\        "显示文件类型及文件状态
@@ -259,6 +257,7 @@ Plug 'scrooloose/nerdtree', { 'on': [] }
 Plug 'ryanoasis/vim-devicons', { 'on': [] }
 Plug 'mattn/emmet-vim', { 'on': [] }
 Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'mhinz/vim-startify'
 "Plug 'jiangmiao/auto-pairs', { 'on': [] }
 "Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': [] }
 Plug 'honza/vim-snippets', { 'on': [] }
@@ -266,7 +265,7 @@ Plug 'SirVer/ultisnips', { 'on': [] }
 Plug 'Valloric/YouCompleteMe', { 'on': [] }
 
 " 500 毫秒后调用 LoadPlug，且只调用一次, 见 `:h timer_start()`
-call timer_start(200, 'LoadPlug')
+call timer_start(300, 'LoadPlug')
 
 function! LoadPlug(timer) abort
   " 手动加载插件
@@ -287,17 +286,18 @@ call plug#end()
 "                                插件配置                                    "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-"nerdtree
-"开启快捷键
+" nerdtree
+" 开启快捷键
 map <F3> :NERDTreeClose<CR>
 map <F3> :NERDTreeToggle<CR>
-"当NERDTree为剩下的唯一窗口时自动关闭
+" 当NERDTree为剩下的唯一窗口时自动关闭
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 let NERDTreeShowHidden=1     "显示隐藏文件
 let g:NERDTreeDirArrowExpandable = '▸'     "树的显示图标
 let g:NERDTreeDirArrowCollapsible = '▾'
 "let g:NERDTreeShowLineNumbers=1  " 显示行号
 let g:NERDTreeWinSize=24    " window size
+
 "emmet-vim
 let g:user_emmet_leader_key='<C-E>'     " 设置快捷键
 
@@ -326,18 +326,44 @@ let g:ycm_error_symbol = '✗'
 let g:ycm_warning_symbol = '⚠'
 " 不显示开启vim时检查ycm_extra_conf文件的信息
 let g:ycm_confirm_extra_conf=0
+" 关闭C#服务
+let g:ycm_auto_start_csharp_server = 0
 " 禁用/开启clangd
 let g:ycm_use_clangd =0
+" 自动关闭预览窗口
+let g:ycm_autoclose_preview_window_after_completion = 1
 " 设置在下面几种格式的文件上屏蔽ycm
 let g:ycm_filetype_blacklist = {
       \ 'tagbar' : 1,
       \ 'nerdtree' : 1,
-      \ 'cs' : 1,
       \}
 let g:ycm_cache_omnifunc=0        " 禁止缓存匹配项,每次都重新生成匹配项
 let g:ycm_seed_identifiers_with_syntax=1    " 语法关键字补全
 "let g:ycm_open_loclist_on_ycm_diags = 0     " 底面打开提示文件
-let g:ycm_add_preview_to_completeopt="popup"
-" ultisnips
-"let g:UltiSnipsExpandTrigger="<enter>"
 
+
+" vim-startify
+let g:startify_custom_header_quotes = [
+    \ ["曾经沧海难为水，除却巫山不是云。","","----元稹《离思五首·其四》"],
+    \ ["溪云初起日沉阁，山雨欲来风满楼。","","----许浑《咸阳城东楼 / 咸阳城西楼晚眺 / 西门》"],
+    \ ["行到水穷处，坐看云起时。","","----王维《终南别业 / 初至山中 / 入山寄城中故人》"],
+    \ ["云想衣裳花想容，春风拂槛露华浓。","","----李白《清平调·其一》"],
+    \ ["天平山上白云泉，云自无心水自闲。","","----白居易《白云泉》"],
+    \ ["兰有秀兮菊有芳，怀佳人兮不能忘。","","----刘彻《秋风辞》"],
+    \ ["秋风起兮白云飞，草木黄落兮雁南归。","","----刘彻《秋风辞》"],
+    \ ["黄河远上白云间，一片孤城万仞山。","","----王之涣《凉州词二首·其一》"],
+    \ ["卧看满天云不动，不知云与我俱东。","","----陈与义《襄邑道中》"],
+    \ ["我欲穿花寻路，直入白云深处，浩气展虹霓。","","----黄庭坚《水调歌头·游览》"],
+    \ ["明月出天山，苍茫云海间。","","----李白《关山月》"],
+    \ ["远上寒山石径斜，白云生处有人家。","","----杜牧《山行》"],
+    \ ["黄鹤一去不复返，白云千载空悠悠。","","----崔颢《黄鹤楼 / 登黄鹤楼》"],
+    \ ["闲云潭影日悠悠，物换星移几度秋。","","----王勃《滕王阁序》"],
+    \ ["纤云弄巧，飞星传恨，银汉迢迢暗度。","","----秦观《鹊桥仙·纤云弄巧》"],
+    \ ["月下飞天镜，云生结海楼。","","----李白《渡荆门送别》"],
+    \ ["叶落当归根，云沉久必起。","","----钱嶫《悯黎咏》"],
+    \ ["只在此山中，云深不知处。","","----贾岛《寻隐者不遇 / 孙革访羊尊师诗》"],
+    \ ["漠漠秋云起，稍稍夜寒生。","","----白居易《微雨夜行》"],
+    \ ["春悄悄，夜迢迢。碧云天共楚宫遥。","","----晏几道《鹧鸪天·小令尊前见玉箫》"],
+    \ ["云无心以出岫，鸟倦飞而知还。","","----陶渊明《归去来兮辞·并序》"],
+    \ ["大风起兮云飞扬。威加海内兮归故乡。安得猛士兮守四方！","","----刘邦《大风歌》"]
+    \ ]

@@ -1,3 +1,4 @@
 vimfiles/plugged
 vimfiles/.netrwhist
 vimfiles/autoload/*.old
+vimrc
