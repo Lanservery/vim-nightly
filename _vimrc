@@ -64,9 +64,11 @@ if has('win32')
   set shell=cmd.exe
 endif
 "set iminsert=2    "解决切换输入法问题(Ctrl + space 就可以切换了)
-set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936    " 解决文件乱码问题
+set fileencodings=utf-8,gb2312,ucs-bom,gb18030,gbk,cp936    " 解决文件乱码问题
 set termencoding=utf-8
 set encoding=utf-8
+" Press F12 reload to  switch to gb2312 encoding
+nnoremap <F12> :e ++enc=gb2312<CR>
 "language messages en_US.utf-8    "解决consle提示信息输出乱码
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -94,12 +96,13 @@ let g:loaded_zip      = 1
 "                                   外观                                     "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-"let $LANG = 'en'
+let $LANG = 'en'    " 底部栏提示改为英文
 set number    "显示行号
 set guifont=DroidSansMono_Nerd_Font:h11
 "set guifont=DroidSansMono_NF:h11
 "colorscheme delek    "主题
 colorscheme flattened_dark
+"colorscheme flattened_light
 set guioptions-=m    "hidden menu bar
 set guioptions-=T    "hidden toolbar
 set guioptions-=r    "hidden the right scrollbar
@@ -171,9 +174,6 @@ func! CompileRun()
     elseif &filetype == 'cpp'
         exec "!g++ % -o %<"
         exec "! ./%<"
-    elseif &filetype == 'java' 
-        exec "!javac %" 
-        exec "!java %<"
     elseif &filetype == 'text'
         exec "silent !plantuml % -tpng"
     elseif &filetype == 'dot'
@@ -183,12 +183,12 @@ endfunc
 
 
 " 自动补全和删除括号
-:inoremap ( ()<ESC>i
-:inoremap { {}<ESC>i
-:inoremap [ []<ESC>i
-:inoremap < <><ESC>i
+":inoremap ( ()<ESC>i
+":inoremap { {}<ESC>i
+":inoremap [ []<ESC>i
+":inoremap < <><ESC>i
 ":inoremap " ""<ESC>i
-:inoremap ' ''<ESC>i
+":inoremap ' ''<ESC>i
 func! DeleteBoth()
 	if (getline('.')[col('.') - 2] == '(' && getline('.')[col('.') - 1] == ')')||(getline('.')[col('.') - 2] == '[' && getline('.')[col('.') - 1] == ']') || (getline('.')[col('.') - 2] == '"' && getline('.')[col('.') - 1] == '"') ||(getline('.')[col('.') - 2] == "'" && getline('.')[col('.') - 1] == "'") || (getline('.')[col('.') - 2] == '{' && getline('.')[col('.') - 1] == '}')||(getline('.')[col('.') - 2] == '<' && getline('.')[col('.') - 1] == '>')
 		return "\<ESC>2s"
@@ -197,22 +197,22 @@ func! DeleteBoth()
 	endif
 endfunc
 " 用退格键删除一个左括号时同时删除对应的右括号
-inoremap <BS> <c-r>=DeleteBoth()<CR>
+"inoremap <BS> <c-r>=DeleteBoth()<CR>
 " 输入一个字符时，如果下一个字符也是括号，则删除它，避免出现重复字符
-function! RemoveNextDoubleChar(char)
-    let l:line = getline(".")
-    let l:next_char = l:line[col(".")] " 取得当前光标后一个字符
- 
-    if a:char == l:next_char
-        execute "normal! l"
-    else
-        execute "normal! a" . a:char . ""
-    end
-endfunction
-inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
-inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
-inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
-inoremap > <ESC>:call RemoveNextDoubleChar('>')<CR>a
+"function! RemoveNextDoubleChar(char)
+"    let l:line = getline(".")
+"    let l:next_char = l:line[col(".")] " 取得当前光标后一个字符
+" 
+"    if a:char == l:next_char
+"        execute "normal! l"
+"    else
+"        execute "normal! a" . a:char . ""
+"    end
+"endfunction
+"inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
+"inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
+"inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
+"inoremap > <ESC>:call RemoveNextDoubleChar('>')<CR>a
 
 " GuiTabel
 " set up tab labels with tab number, buffer name, number of windows
@@ -258,8 +258,10 @@ Plug 'ryanoasis/vim-devicons', { 'on': [] }
 Plug 'mattn/emmet-vim', { 'on': [] }
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'mhinz/vim-startify'
-"Plug 'jiangmiao/auto-pairs', { 'on': [] }
-"Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': [] }
+Plug 'Yggdroot/indentLine',{ 'for': ['python', 'javascript','html','htmldjango','typescript','css'] }
+Plug 'yegappan/taglist', { 'on': 'TlistToggle' }
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plug 'jiangmiao/auto-pairs'
 Plug 'honza/vim-snippets', { 'on': [] }
 Plug 'SirVer/ultisnips', { 'on': [] }
 Plug 'Valloric/YouCompleteMe', { 'on': [] }
@@ -271,12 +273,10 @@ function! LoadPlug(timer) abort
   " 手动加载插件
   call plug#load('vim-devicons')
   call plug#load('emmet-vim')
-  "call plug#load('coc.nvim')
   call plug#load('YouCompleteMe')
   call plug#load('nerdtree')
   autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif  " Open NERDTree on each new tab.
   call plug#load('vim-snippets')
-  "call plug#load('auto-pairs')
   call plug#load('ultisnips')
 endfunction
 
@@ -297,30 +297,35 @@ let g:NERDTreeDirArrowExpandable = '▸'     "树的显示图标
 let g:NERDTreeDirArrowCollapsible = '▾'
 "let g:NERDTreeShowLineNumbers=1  " 显示行号
 let g:NERDTreeWinSize=24    " window size
+"Delete help information at the top
+let NERDTreeMinimalUI=1
+
+let NERDTreeAutoCenter=1
+" 删除文件时自动删除文件对应 buffer
+let NERDTreeAutoDeleteBuffer=1
+"鼠标模式:目录单击,文件双击
+"let NERDTreeMouseMode=2
 
 "emmet-vim
 let g:user_emmet_leader_key='<C-E>'     " 设置快捷键
 
 " auto-pairs
-"let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', "`":"`", '```':'```', '"""':'"""', "'''":"'''",'<':'>'}
-
-" Coc
-" Use <C-l> for trigger snippet expand.
-"imap <C-l> <Plug>(coc-snippets-expand)
+let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"',"`":"`", '```':'```', '"""':'"""', "'''":"'''",'<':'>'}
+" 防止与YCM的 Enter 键有冲突
+let g:AutoPairsMapCR = 0
 
 " YCM
-let g:ycm_key_list_stop_completion = ['<enter>']        " stop list completion
 " 回车即选中当前项
-"inoremap <expr> <CR>       pumvisible() ? "\<C-y>" : "\<CR>"
+let g:ycm_key_list_stop_completion = ['<enter>']        " stop list completion
 " 跳转到定义处
 nnoremap <c-j> :YcmCompleter GoToDefinitionElseDeclaration<CR>
-" 从第1个键入字符就开始罗列匹配项
-"let g:ycm_min_num_of_chars_for_completion=1
 "youcompleteme  默认tab  s-tab 和 ultisnips 冲突
 let g:ycm_key_list_select_completion = ['<Down>']
 let g:ycm_key_list_previous_completion = ['<Up>']
 " 修改对C函数的补全快捷键，默认是CTRL + space，修改为ALT + ;
 let g:ycm_key_invoke_completion = '<M-;>'
+" 关闭错误诊断
+let g:ycm_show_diagnostics_ui = 0
 " 警告和错误
 let g:ycm_error_symbol = '✗'
 let g:ycm_warning_symbol = '⚠'
@@ -329,18 +334,43 @@ let g:ycm_confirm_extra_conf=0
 " 关闭C#服务
 let g:ycm_auto_start_csharp_server = 0
 " 禁用/开启clangd
-let g:ycm_use_clangd =0
+let g:ycm_use_clangd = 1
 " 自动关闭预览窗口
 let g:ycm_autoclose_preview_window_after_completion = 1
+"在字符串输入中也能补全
+let g:ycm_complete_in_strings = 1
+" 文件白名单
+let g:ycm_filetype_whitelist = {
+            \ "c":1,
+            \ "cpp":1,
+            \ "python":1,
+            \ "javascript":1,
+            \ "typescript":1,
+            \ "go":1,
+            \ "css":1,
+            \ "html":1,
+            \ }
+" 语义触发
+"let g:ycm_semantic_triggers =  {
+"            \ 'c,cpp,python,java,go,typescript': ['re!\w{2}'],
+"            \ 'cs,lua,javascript': ['re!\w{2}'],
+"            \ }
 " 设置在下面几种格式的文件上屏蔽ycm
-let g:ycm_filetype_blacklist = {
-      \ 'tagbar' : 1,
-      \ 'nerdtree' : 1,
-      \}
+"let g:ycm_filetype_blacklist = {
+"      \ 'tagbar' : 1,
+"      \ 'nerdtree' : 1,
+"      \}
 let g:ycm_cache_omnifunc=0        " 禁止缓存匹配项,每次都重新生成匹配项
 let g:ycm_seed_identifiers_with_syntax=1    " 语法关键字补全
-"let g:ycm_open_loclist_on_ycm_diags = 0     " 底面打开提示文件
+let g:ycm_disable_for_files_larger_than_kb = 3000    " YCM服务开启最大文件限制
+" 关闭函数原型预览窗口
+"set completeopt=menu,menuone
+"let g:ycm_add_preview_to_completeopt = 0
 
+
+" indentLine
+let g:indentLine_char = '|'
+"let g:indentLine_conceallevel = 2   " 使插件正常运行
 
 " vim-startify
 let g:startify_custom_header_quotes = [
